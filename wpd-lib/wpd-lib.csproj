@@ -8,7 +8,8 @@
     <RootNamespace>WindowsPortableDevicesLib</RootNamespace>
     <AssemblyName>wpd-lib</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -40,9 +41,6 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging">
-      <HintPath>..\packages\Common.Logging.2.1.1\lib\net40\Common.Logging.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.PortableDeviceApiLib">
       <HintPath>lib\Interop.PortableDeviceApiLib.dll</HintPath>
     </Reference>
@@ -75,9 +73,6 @@
     <Compile Include="WindowsPortableDevice.cs" />
     <Compile Include="WindowsPortableDeviceService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="PortableDeviceConnectApiLib">

@@ -16,7 +16,7 @@ namespace WindowsPortableDevicesLib.Domain
     /// </summary>
     public class PortableDeviceFolder : PortableDeviceObject
     {
-        public PortableDeviceFolder(string id, string name) : base(id, name)
+        public PortableDeviceFolder(string id, string name, PortableDeviceObject parent) : base(id, name, parent)
         {
             this.Files = new List<PortableDeviceObject>();
         }

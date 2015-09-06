@@ -1363,6 +1363,17 @@ namespace WindowsPortableDevicesLib.Domain
             WPD_PROPERTY_PUBLIC_KEY.pid = 1001;
         }
 
+        public enum WPD_DEVICE_TYPES
+        {
+            WPD_DEVICE_TYPE_GENERIC = 0,
+            WPD_DEVICE_TYPE_CAMERA = 1,
+            WPD_DEVICE_TYPE_MEDIA_PLAYER = 2,
+            WPD_DEVICE_TYPE_PHONE = 3,
+            WPD_DEVICE_TYPE_VIDEO = 4,
+            WPD_DEVICE_TYPE_PERSONAL_INFORMATION_MANAGER = 5,
+            WPD_DEVICE_TYPE_AUDIO_RECORDER = 6
+        };
+
         public static PortableDeviceApiLib._tagpropertykey WPD_RESOURCE_DEFAULT;
         public static PortableDeviceApiLib._tagpropertykey WPD_RESOURCE_CONTACT_PHOTO;
         public static PortableDeviceApiLib._tagpropertykey WPD_RESOURCE_THUMBNAIL;

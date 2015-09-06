@@ -35,7 +35,7 @@ namespace WindowsPortableDevicesLib
                     device.Connect();
                     Console.WriteLine("-------------------------------------------------------------");
                     Console.WriteLine("{0} {1} {2}", ++index, device.FriendlyName, device.DeviceID);
-                    var folder = device.GetContents();
+                    var folder = device.GetContentsRecursive();
                     foreach(var item in folder.Files)
                     {
                         DisplayObject(item);
@@ -51,7 +51,7 @@ namespace WindowsPortableDevicesLib
             Console.Write("Press any key to continue . . . ");
             Console.ReadKey(true);
         }
-        
+
         public static void DisplayObject(PortableDeviceObject portableDeviceObject)
         {
             Console.WriteLine(portableDeviceObject.Name);
@@ -65,7 +65,7 @@ namespace WindowsPortableDevicesLib
         {
             foreach (var item in folder.Files)
             {
-                Console.WriteLine(item.Id);
+                Console.WriteLine(item.Name);
                 if (item is PortableDeviceFolder)
                 {
                     DisplayFolderContents((PortableDeviceFolder) item);
