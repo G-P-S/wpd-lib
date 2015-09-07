@@ -151,7 +151,6 @@ namespace WindowsPortableDevicesLib.Domain
             string pathSoFar = "/";
             foreach (string folderToFind in directories)
             {
-                pathSoFar += folderToFind + "/";
                 if (thisLevel.Files.Count == 0)
                     goto notFound;
 
@@ -166,12 +165,14 @@ namespace WindowsPortableDevicesLib.Domain
 
                 if (!folderFound)
                     goto notFound;
+
+                pathSoFar += folderToFind + "/";
             }
 
             return thisLevel;
 
         notFound:
-            throw new DirectoryNotFoundException("Failed to find the MTP path " + path + " at level " + pathSoFar + ".");
+            throw new DirectoryNotFoundException("Failed to find the MTP path \"" + path + "\" at level \"" + pathSoFar + "\".");
         }
 
         public void GetFile(PortableDeviceFile file, string saveToPath)
@@ -422,6 +423,8 @@ namespace WindowsPortableDevicesLib.Domain
             IEnumPortableDeviceObjectIDs objectIds;
             content.EnumObjects(0, deviceObject.Id, null, out objectIds);
 
+            deviceObject.Files.Clear();
+            
             uint fetched = 0;
             do
             {
@@ -447,6 +450,8 @@ namespace WindowsPortableDevicesLib.Domain
             // Enumerate the items contained by the current object
             IEnumPortableDeviceObjectIDs objectIds;
             content.EnumObjects(0, deviceObject.Id, null, out objectIds);
+
+            deviceObject.Files.Clear();
 
             uint fetched = 0;
             do
