@@ -145,31 +145,41 @@ namespace WindowsPortableDevicesLib.Domain
                 return null;
 
             string[] directories = path.Split('/');
-
-            PortableDeviceFolder contents = this.GetContentsOfRecursive();
-            PortableDeviceFolder thisLevel = contents;
             string pathSoFar = "/";
-            foreach (string folderToFind in directories)
+
+            try
             {
-                if (thisLevel.Files.Count == 0)
-                    goto notFound;
+                PortableDeviceFolder contents = this.GetContentsOfRecursive();
+                PortableDeviceFolder thisLevel = contents;
+                foreach (string folderToFind in directories)
+                {
+                    if (thisLevel.Files.Count == 0)
+                        goto notFound;
 
-                bool folderFound = false;
-                foreach (PortableDeviceFolder f in thisLevel.Files)
-                    if (f.Name == folderToFind)
-                    {
-                        thisLevel = f;
-                        folderFound = true;
-                        break;
-                    }
+                    bool folderFound = false;
+                    foreach (PortableDeviceObject f in thisLevel.Files)
+                        if (f.Name == folderToFind && f.GetType() == typeof(PortableDeviceFolder))
+                        {
+                            thisLevel = (PortableDeviceFolder)f;
+                            folderFound = true;
+                            break;
+                        }
 
-                if (!folderFound)
-                    goto notFound;
+                    if (!folderFound)
+                        goto notFound;
 
-                pathSoFar += folderToFind + "/";
+                    pathSoFar += folderToFind + "/";
+                }
+
+                return thisLevel;
             }
-
-            return thisLevel;
+            catch (Exception exc)
+            {
+                throw new Exception(
+                    "Exception during search for directory \"" + path + "\"\n" +
+                    "pathSoFar = " + pathSoFar + "\nException message:\n" +
+                    exc.Message);
+            }
 
         notFound:
             throw new DirectoryNotFoundException("Failed to find the MTP path \"" + path + "\" at level \"" + pathSoFar + "\".");
@@ -221,14 +231,14 @@ namespace WindowsPortableDevicesLib.Domain
             }
         }
 
-        public PortableDeviceFile PutFile(string fileName, PortableDeviceFolder parent)
+        public PortableDeviceFile PutFile(string localFilePath, PortableDeviceFolder parent)
         {
             ValidateConnection();
   
             IPortableDeviceContent content;
             device.Content(out content);
 
-            IPortableDeviceValues values = GetRequiredPropertiesForContentType(fileName, parent.Id);
+            IPortableDeviceValues values = GetRequiredPropertiesForContentType(localFilePath, parent.Id);
 
             PortableDeviceApiLib.IStream tempStream;
             uint optimalTransferSizeBytes = 0;
@@ -239,7 +249,7 @@ namespace WindowsPortableDevicesLib.Domain
 
             try
             {
-                using (FileStream sourceStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                using (FileStream sourceStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
                 {
                     var buffer = new byte[optimalTransferSizeBytes];
                     int bytesRead;
@@ -255,7 +265,7 @@ namespace WindowsPortableDevicesLib.Domain
                 //Re-enumerate the contents of the folder, and return the new file.
                 GetContentsOf(parent);
                 foreach (PortableDeviceFile f in parent.Files)
-                    if (f.Name == fileName)
+                    if (f.Name == Path.GetFileName(localFilePath))
                         return f;
 
                 return null;
@@ -282,6 +292,7 @@ namespace WindowsPortableDevicesLib.Domain
             values.SetStringValue(DevicePropertyKeys.WPD_OBJECT_ORIGINAL_FILE_NAME, Path.GetFileName(fileName));
             values.SetStringValue(DevicePropertyKeys.WPD_OBJECT_NAME, Path.GetFileName(fileName));
             values.SetBoolValue(DevicePropertyKeys.WPD_OBJECT_CAN_DELETE, 1);
+            values.SetGuidValue(DevicePropertyKeys.WPD_OBJECT_FORMAT, DeviceGUIDS.WPD_CONTENT_TYPE_UNSPECIFIED);
 
             return values;
         }
@@ -320,7 +331,7 @@ namespace WindowsPortableDevicesLib.Domain
             if (parent == null)
                 parentID = DeviceID;
             else
-                parentID = parent.PersistentId;
+                parentID = parent.Id;
 
             // Enumerate the items contained by the current object
             IEnumPortableDeviceObjectIDs objectIds;
