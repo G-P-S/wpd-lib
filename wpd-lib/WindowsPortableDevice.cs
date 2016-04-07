@@ -467,20 +467,27 @@ namespace WindowsPortableDevicesLib.Domain
             uint fetched = 0;
             do
             {
-                string objectId;
-
-                objectIds.Next(1, out objectId, ref fetched);
-                if (fetched > 0)
+                //Buggy MTP devices will cause issues during this recursive object search.
+                //So we choose (for now) to swallow any errors.
+                try
                 {
-                    var currentObject = WrapObject(properties, objectId, deviceObject);
+                    string objectId;
 
-                    deviceObject.Files.Add(currentObject);
-
-                    if (currentObject is PortableDeviceFolder)
+                    objectIds.Next(1, out objectId, ref fetched);
+                    if (fetched > 0)
                     {
-                        EnumerateContentsOfRecursive(ref content, (PortableDeviceFolder)currentObject);
+                        var currentObject = WrapObject(properties, objectId, deviceObject);
+
+                        deviceObject.Files.Add(currentObject);
+
+                        if (currentObject is PortableDeviceFolder)
+                        {
+                            EnumerateContentsOfRecursive(ref content, (PortableDeviceFolder)currentObject);
+                        }
                     }
                 }
+                catch (Exception)
+                { }
             } while (fetched > 0);
         }
 
