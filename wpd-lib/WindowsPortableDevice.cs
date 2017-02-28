@@ -452,12 +452,6 @@ namespace WindowsPortableDevicesLib.Domain
             } while (fetched > 0);
         }
 
-        //Note: For some reason, this function stops at 200 objects inside a folder; i.e.
-        //after that, objectIds.Next(1, out objectId, ref fetched) returns fetched = 0.
-        //It may have to do with the fact that this Next function is not marshalled correctly, 
-        //As the C version has the second parameter as an array of pointers to strings, and
-        //Calling this C# version with the first parameter greater than 1 causes objects
-        //to be skipped.
         private static void EnumerateContentsOfRecursive(ref IPortableDeviceContent content, PortableDeviceFolder deviceObject)
         {
             int fileCounter = 0;
@@ -497,8 +491,6 @@ namespace WindowsPortableDevicesLib.Domain
                         {
                             fileCounter++;
                             Console.WriteLine("[wpd-lib] " + fileCounter.ToString("0000") + " found a file: " + currentObject.GetFullPath());
-                            if (fileCounter == 200)
-                                Console.WriteLine("[wpd-lib] WARNING: this library cannot find files after the first 200.");
                         }
                     }
                     else
